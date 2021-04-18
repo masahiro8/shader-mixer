@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>shader-mixer</title>
+  </head>
+  <body>
+    <div>
+      <div class="sliders">
+        <div class="sliders__item">
+          <div class="sliders__label">size</div>
+          <input id="s_size" class="slider" type="range" min="0" max="100">
+        </div>
+        <div class="sliders__item">
+          <div class="sliders__label">x speed</div>
+          <input id="s_x_speed" class="slider" type="range" min="0" max="100">
+        </div>
+        <div class="sliders__item">
+          <div class="sliders__label">y speed</div>
+          <input id="s_y_speed" class="slider" type="range" min="0" max="100">
+        </div>
+        <div class="sliders__item">
+          <div class="sliders__label">particles</div>
+          <input id="s_particles" class="slider" type="range" min="0" max="100">
+        </div>
+      </div>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/mSocket.js"></script>
+    <script src="/js/mEvents.js"></script>
+    <script>
+      window.addEventListener("load", () => {
+        const mixerSockets = _mixerSockets();
+        const mixerEvents = _mixerEvents([
+          "s_size",
+          "s_x_speed",
+          "s_y_speed",
+          "s_particles"
+        ], mixerSockets);
+
+        mixerSockets.init();
+        mixerSockets.attach((values)=>{
+          console.log(values);
+        })
+        mixerEvents.init();
+      });
+      
+    </script>
+    <style>
+      body {
+        background-color: rgb(36, 44, 69);
+      }
+      .sliders {
+        height:100vh;
+        display:flex;
+        flex-direction:column;
+        justify-content: space-around;
+      }
+      .sliders__item {
+        padding: 0 16px;
+      }
+      .sliders__label {
+        color:white;
+        font-size:16px;
+      }
+      .slider {
+        appearance:none;
+        width: 100%;
+        height: .1rem;
+        outline: none;
+        border-radius: .05rem;
+        margin:24px 0;
+      }
+      .slider::-webkit-slider-thumb {
+        appearance: none;
+        width: 2rem;
+        height: 2rem;
+        background-color: rgb(36, 44, 69);
+        border: .25rem solid white;
+        border-radius: 1rem;
+        cursor: pointer;
+      }
+    </style>
+  </body>
+</html>
