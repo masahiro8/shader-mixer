@@ -43,12 +43,23 @@ const TH = () => {
       if (smesh && "uniforms" in smesh.material) {
         smesh.material.uniforms.uTime.value = frame;
         smesh.material.uniforms.uMouse.value = mouse;
-        const { s_x_speed, s_y_speed, s_particles, s_size } = values;
+        const {
+          s_x_speed,
+          s_y_speed,
+          s_particles,
+          s_size,
+          s_x_position,
+          s_y_position,
+        } = values;
         if (s_x_speed) smesh.material.uniforms.s_x_speed.value = s_x_speed;
         if (s_y_speed) smesh.material.uniforms.s_y_speed.value = s_y_speed;
+        if (s_size) smesh.material.uniforms.s_size.value = s_size;
         if (s_particles)
           smesh.material.uniforms.s_particles.value = s_particles;
-        if (s_size) smesh.material.uniforms.s_size.value = s_size;
+        if (s_x_position)
+          smesh.material.uniforms.s_x_position.value = s_x_position;
+        if (s_y_position)
+          smesh.material.uniforms.s_y_position.value = s_y_position;
       }
       renderer.render(scene, camera);
     };
@@ -73,6 +84,8 @@ const TH = () => {
       s_y_speed: { value: 0.1 },
       s_size: { value: 1 },
       s_particles: { value: 100 },
+      s_x_position: { value: 0.5 },
+      s_y_position: { value: 0.5 },
     };
 
     if (TEX) uniforms.uTex = { value: TEX };
@@ -92,12 +105,21 @@ const TH = () => {
     scene.add(smesh);
   };
 
-  const updateValues = ({ s_x_speed, s_y_speed, s_particles, s_size }) => {
+  const updateValues = ({
+    s_x_speed,
+    s_y_speed,
+    s_particles,
+    s_size,
+    s_x_position,
+    s_y_position,
+  }) => {
     values = {
       s_x_speed: s_x_speed * 20.0,
       s_y_speed: s_y_speed * 2.0,
       s_particles: Math.floor(s_particles * 100),
       s_size: s_size,
+      s_x_position: s_x_position,
+      s_y_position: s_y_position,
     };
   };
 

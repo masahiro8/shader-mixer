@@ -26,6 +26,8 @@ uniform float s_size;
 uniform int s_particles;
 uniform float s_x_speed;
 uniform float s_y_speed;
+uniform float s_x_position;
+uniform float s_y_position;
 
 //バーテックスシェーダーから変数を受け取る
 varying vec2 vUv;
@@ -42,8 +44,8 @@ void main( void ) {
   vec4 color = texture2D( uTex, vUv ).rgba;
 
   //マウスからの距離
-  float distance = sqrt( pow(uMouse.x - gl_FragCoord.x, 2.) + pow(gl_FragCoord.y - uMouse.y, 2.));
-  float _a = distance < 10.?(10.-distance)/10.:0.;
+  // float distance = sqrt( pow(uMouse.x - gl_FragCoord.x, 2.) + pow(gl_FragCoord.y - uMouse.y, 2.));
+  // float _a = distance < 10.?(10.-distance)/10.:0.;
 
   vec2 _size = uSize;
 
@@ -51,9 +53,13 @@ void main( void ) {
   float rs = 100.;
   vec2 pos = (gl_FragCoord.xy * 2.0 - _size) / rs;
 
-  //メッシュの中心座標を正規化
-  float norm_x = uMouse.x / _size.x * .5;
-  float norm_y = uMouse.y / _size.y * .5;
+  //マウス座標で形状変化
+  // float norm_x = uMouse.x / _size.x * .5;
+  // float norm_y = uMouse.y / _size.y * .5;
+
+  //コントローラから形状変化
+  float norm_x = s_x_position;
+  float norm_y = s_y_position;
 
   //画面の正規化
   float size_x = 100. / uSize.x;

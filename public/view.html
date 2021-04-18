@@ -41,7 +41,7 @@
       mixerSockets.init();
       mixerSockets.attach((values) => {
         let keyAndValue = { s_x_speed: .5, s_y_speed: .5, s_particles: .5, s_size: .5 };
-        ["s_size","s_particles","s_x_speed","s_y_speed"].forEach(key => {
+        ["s_size","s_particles","s_x_speed","s_y_speed","s_x_position","s_y_position"].forEach(key => {
           const _item = values.find(item => { return item.key === key});
           if(_item){
             keyAndValue[_item.key] = _item.value;

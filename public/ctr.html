@@ -8,6 +8,14 @@
     <div>
       <div class="sliders">
         <div class="sliders__item">
+          <div class="sliders__label">x position</div>
+          <input id="s_x_position" class="slider" type="range" min="0" max="100">
+        </div>
+        <div class="sliders__item">
+          <div class="sliders__label">y position</div>
+          <input id="s_y_position" class="slider" type="range" min="0" max="100">
+        </div>
+        <div class="sliders__item">
           <div class="sliders__label">size</div>
           <input id="s_size" class="slider" type="range" min="0" max="100">
         </div>
@@ -35,7 +43,9 @@
           "s_size",
           "s_x_speed",
           "s_y_speed",
-          "s_particles"
+          "s_particles",
+          "s_x_position",
+          "s_y_position"
         ], mixerSockets);
 
         mixerSockets.init();
