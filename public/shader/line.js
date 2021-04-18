@@ -9,10 +9,6 @@ varying vec4 sPosition;
 
 void main() {
   vUv = uv;
-  // vec4 cPosition = modelViewMatrix * vec4(uCenter, 1.0);    // 変換：ローカル座標 → カメラレンズ座標
-  // sPosition = projectionMatrix * cPosition;                 // 変換：カメラレンズ座標 → 画面座標
-  // gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
-
   vec3 pos = position;
   gl_PointSize = 1.0;
   gl_Position = vec4( pos, 1.0 );

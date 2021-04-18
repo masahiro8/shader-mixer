@@ -7,8 +7,7 @@ const TH = () => {
   let smesh;
   let mouse = { x: 0, y: 0 };
 
-  //ソケットで受け取った値を渡す
-  let values = {};
+  let values = {}; //Socket values
 
   const init = ({ canvasId, width, height }) => {
     scene = new THREE.Scene();
@@ -37,12 +36,10 @@ const TH = () => {
       mouse = { x: e.clientX, y: window.innerHeight - e.clientY };
     });
 
-    // レンダリング
     const nrender = () => {
       requestAnimationFrame(nrender);
       frame = frame + 1.0;
 
-      //シェーダー用メッシュを更新
       if (smesh && "uniforms" in smesh.material) {
         smesh.material.uniforms.uTime.value = frame;
         smesh.material.uniforms.uMouse.value = mouse;
@@ -89,7 +86,6 @@ const TH = () => {
       transparent: true,
     });
 
-    //板ポリ
     const geo = new THREE.PlaneGeometry(100, 100, 1, 1);
     smesh = new THREE.Mesh(geo, mat);
 
@@ -97,11 +93,9 @@ const TH = () => {
   };
 
   const updateValues = ({ s_x_speed, s_y_speed, s_particles, s_size }) => {
-    //シェーダーに渡す値を調整する
-    //{ s_x_speed: 20., s_y_speed: 1., s_particles: 200, s_size: .25 }
     values = {
       s_x_speed: s_x_speed * 20.0,
-      s_y_speed: s_x_speed * 2.0,
+      s_y_speed: s_y_speed * 2.0,
       s_particles: Math.floor(s_particles * 100),
       s_size: s_size,
     };

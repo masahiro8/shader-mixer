@@ -1,5 +1,5 @@
 /**
- * ソケット
+ * Socket
  *
  */
 const _mixerSockets = () => {
