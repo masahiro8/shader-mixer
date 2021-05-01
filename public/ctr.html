@@ -2,59 +2,101 @@
 <html>
   <head>
     <title>shader-mixer</title>
-    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
   </head>
   <body>
     <div>
+      <div class="modules">
+        <div>
+          modules
+          <select id="s_module"></select>
+        </div>
+      </div>
       <div class="sliders">
         <div class="sliders__item">
           <div class="sliders__label">x position</div>
-          <input id="s_x_position" class="slider" type="range" min="0" max="100">
+          <input
+            id="s_x_position"
+            class="slider"
+            type="range"
+            min="0"
+            max="100"
+          />
         </div>
         <div class="sliders__item">
           <div class="sliders__label">y position</div>
-          <input id="s_y_position" class="slider" type="range" min="0" max="100">
+          <input
+            id="s_y_position"
+            class="slider"
+            type="range"
+            min="0"
+            max="100"
+          />
         </div>
         <div class="sliders__item">
           <div class="sliders__label">size</div>
-          <input id="s_size" class="slider" type="range" min="0" max="100">
+          <input id="s_size" class="slider" type="range" min="0" max="100" />
         </div>
         <div class="sliders__item">
           <div class="sliders__label">x speed</div>
-          <input id="s_x_speed" class="slider" type="range" min="0" max="100">
+          <input id="s_x_speed" class="slider" type="range" min="0" max="100" />
         </div>
         <div class="sliders__item">
           <div class="sliders__label">y speed</div>
-          <input id="s_y_speed" class="slider" type="range" min="0" max="100">
+          <input id="s_y_speed" class="slider" type="range" min="0" max="100" />
         </div>
         <div class="sliders__item">
           <div class="sliders__label">particles</div>
-          <input id="s_particles" class="slider" type="range" min="0" max="100">
+          <input
+            id="s_particles"
+            class="slider"
+            type="range"
+            min="0"
+            max="100"
+          />
         </div>
       </div>
     </div>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/js/mSocket.js"></script>
     <script src="/js/mEvents.js"></script>
+    <script src="/shader/MODS.js"></script>
     <script>
+      const initModulesSelecter = (mdl) => {
+        const select = document.getElementById("s_module");
+        mdl.forEach((item) => {
+          const option = document.createElement("option");
+          option.value = item.file;
+          option.innerHTML = `${item.file}`;
+          select.appendChild(option);
+        });
+      };
+
       window.addEventListener("load", () => {
+        //ミキサー
         const mixerSockets = _mixerSockets();
-        const mixerEvents = _mixerEvents([
-          "s_size",
-          "s_x_speed",
-          "s_y_speed",
-          "s_particles",
-          "s_x_position",
-          "s_y_position"
-        ], mixerSockets);
+
+        //module選択
+        initModulesSelecter(MODULES);
+        const mixerEvents = _mixerEvents(
+          [
+            { id: "s_size", type: "number" },
+            { id: "s_x_speed", type: "number" },
+            { id: "s_y_speed", type: "number" },
+            { id: "s_particles", type: "number" },
+            { id: "s_x_position", type: "number" },
+            { id: "s_y_position", type: "number" },
+            { id: "s_module", type: "file" },
+          ],
+          mixerSockets
+        );
 
         mixerSockets.init();
-        mixerSockets.attach((values)=>{
+        mixerSockets.attach((values) => {
           console.log(values);
-        })
+        });
         mixerEvents.init();
       });
-      
     </script>
     <style>
       body {
@@ -62,35 +104,39 @@
         font-family: sans-serif;
       }
       .sliders {
-        height:100vh;
-        display:flex;
-        flex-direction:column;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
         justify-content: space-around;
       }
       .sliders__item {
         padding: 0 8px;
       }
       .sliders__label {
-        color:white;
-        font-size:22px;
+        color: white;
+        font-size: 14px;
       }
       .slider {
-        appearance:none;
+        appearance: none;
         width: 100%;
-        height: .1rem;
+        height: 0.1rem;
         outline: none;
-        border-radius: .05rem;
+        border-radius: 0.05rem;
         margin: 12px 0;
         background-color: white;
       }
       .slider::-webkit-slider-thumb {
         appearance: none;
-        width: 1.5rem;
-        height: 1.5rem;
+        width: 2rem;
+        height: 2rem;
         background-color: white;
-        border: .25rem solid white;
+        border: 0.1rem solid white;
         border-radius: 1rem;
         cursor: pointer;
+      }
+      .modules {
+        color: white;
+        font-size: 16px;
       }
     </style>
   </body>

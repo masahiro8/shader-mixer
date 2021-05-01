@@ -11,12 +11,15 @@ const _mixerEvents = (sliderIds, soc) => {
 
   const init = () => {
     ids = sliderIds;
-    ids.forEach((id) => {
-      sliders[id] = document.getElementById(id);
-      sliders[id].addEventListener("change", () => {
+    ids.forEach((item) => {
+      sliders[item.id] = document.getElementById(item.id);
+      sliders[item.id].addEventListener("change", () => {
         values = [];
-        ids.forEach((id) => {
-          values.push({ key: id, value: sliders[id].value / 100 });
+        ids.forEach((item) => {
+          if (item.type === "number")
+            values.push({ key: item.id, value: sliders[item.id].value / 100 });
+          if (item.type === "file")
+            values.push({ key: item.id, value: sliders[item.id].value });
         });
         soc.update(values);
       });

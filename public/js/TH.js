@@ -5,6 +5,8 @@ const TH = () => {
   let renderer;
   let frame = 1.0;
   let smesh;
+  let smesh_geo;
+  let smesh_mat;
   let mouse = { x: 0, y: 0 };
 
   let values = {}; //Socket values
@@ -71,6 +73,16 @@ const TH = () => {
   };
 
   const addMeshShader = ({ FS_CODE, VS_CODE, TEX }) => {
+    if (smesh) {
+      scene.remove(smesh);
+      smesh_geo.dispose();
+      smesh_mat.dispose();
+      smesh = null;
+      smesh_geo = null;
+      smesh_mat = null;
+      console.log("remove mesh");
+    }
+
     let uniforms = {
       uCenter: { value: { x: 0, y: 0, z: 0 } },
       uTime: {
@@ -90,7 +102,7 @@ const TH = () => {
 
     if (TEX) uniforms.uTex = { value: TEX };
 
-    const mat = new THREE.ShaderMaterial({
+    smesh_mat = new THREE.ShaderMaterial({
       uniforms: uniforms,
       vertexShader: VS_CODE,
       fragmentShader: FS_CODE,
@@ -99,10 +111,11 @@ const TH = () => {
       transparent: true,
     });
 
-    const geo = new THREE.PlaneGeometry(100, 100, 1, 1);
-    smesh = new THREE.Mesh(geo, mat);
+    smesh_geo = new THREE.PlaneGeometry(100, 100, 1, 1);
+    smesh = new THREE.Mesh(smesh_geo, smesh_mat);
 
     scene.add(smesh);
+    console.log("mesh ass");
   };
 
   const updateValues = ({

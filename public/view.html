@@ -1,71 +1,111 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, user-scalable=no" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <title>three</title>
-  <meta name="description" content="${description}" />
-</head>
-<body>
-  <script type="text/javascript" src="./node_modules/three/build/three.js"></script>
-  <script type="text/javascript" src="./node_modules/three/examples/js/controls/OrbitControls.js"></script>
-  <script type="text/javascript" src="/js/TH.js?v=21"></script>
-  <script src="/socket.io/socket.io.js"></script>
-  <script src="/js/mSocket.js"></script>
-  <script>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <title>three</title>
+    <meta name="description" content="${description}" />
+  </head>
+  <body>
+    <script
+      type="text/javascript"
+      src="./node_modules/three/build/three.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="./node_modules/three/examples/js/controls/OrbitControls.js"
+    ></script>
+    <script type="text/javascript" src="/js/TH.js?v=21"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/mSocket.js"></script>
+    <script src="/shader/MODS.js"></script>
+    <script>
+      //シェーダーのロード
+      const importMod = (path) => {
+        return new Promise(async (resolved) => {
+          const module = await import(path);
+          resolved({ ...module });
+        });
+      };
 
-    //シェーダーのロード
-    const importMod = (path) => {
-      return new Promise(async resolved => {
-        const module = await import(path);
-        resolved({ ...module });
-      });
-    }
+      window.addEventListener("load", async () => {
+        let current_module = MODULES[0].file;
+        //three.js
+        const three = TH();
+        three.init({
+          canvasId: "three",
+          width: window.innerWidth,
+          height: window.innerHeight,
+        });
+        const rand = Math.random() * 100;
+        const { FS_CODE, VS_CODE } = await importMod(
+          `${current_module}?v=${rand}`
+        );
+        three.addMeshShader({ FS_CODE, VS_CODE });
+        three.updateValues({
+          s_x_speed: 0.5,
+          s_y_speed: 0.5,
+          s_particles: 0.5,
+          s_size: 0.5,
+        });
 
-    window.addEventListener("load", async () => {
-      //three.js
-      const three = TH();
-      three.init({
-        canvasId: "three",
-        width: window.innerWidth,
-        height: window.innerHeight
-      });
-      const rand = Math.random() * 100;
-      const { FS_CODE, VS_CODE } = await importMod(`./shader/line.js?v=${rand}`);
-      three.addMeshShader({ FS_CODE, VS_CODE});
-      three.updateValues({ s_x_speed: .5, s_y_speed: .5, s_particles: .5, s_size: .5 })
-
-      //socket
-      const mixerSockets = _mixerSockets();
-      mixerSockets.init();
-      mixerSockets.attach((values) => {
-        let keyAndValue = { s_x_speed: .5, s_y_speed: .5, s_particles: .5, s_size: .5 };
-        ["s_size","s_particles","s_x_speed","s_y_speed","s_x_position","s_y_position"].forEach(key => {
-          const _item = values.find(item => { return item.key === key});
-          if(_item){
-            keyAndValue[_item.key] = _item.value;
+        //socket
+        const mixerSockets = _mixerSockets();
+        mixerSockets.init();
+        mixerSockets.attach(async (values) => {
+          //シェーダーを変更
+          const mod = values.find((item) => {
+            return item.key === "s_module";
+          });
+          console.log("mod", current_module, mod.value);
+          if (current_module !== mod.value) {
+            console.log("update mod", mod.value);
+            current_module = mod.value;
+            const { FS_CODE, VS_CODE } = await importMod(
+              `${mod.value}?v=${rand}`
+            );
+            three.addMeshShader({ FS_CODE, VS_CODE });
           }
-        })
-        three.updateValues(keyAndValue);
-      })
 
-    });
+          //パラメータを変更
+          let keyAndValue = {
+            s_x_speed: 0.5,
+            s_y_speed: 0.5,
+            s_particles: 0.5,
+            s_size: 0.5,
+          };
+          [
+            "s_size",
+            "s_particles",
+            "s_x_speed",
+            "s_y_speed",
+            "s_x_position",
+            "s_y_position",
+          ].forEach((key) => {
+            const _item = values.find((item) => {
+              return item.key === key;
+            });
+            if (_item) {
+              keyAndValue[_item.key] = _item.value;
+            }
+          });
+          three.updateValues(keyAndValue);
+        });
+      });
+    </script>
+    <div id="three"></div>
+    <canvas id="gl-canvas"></canvas>
+    <style>
+      body {
+        padding: 0;
+        margin: 0;
+      }
 
-  </script>
-  <div id="three"></div>
-  <canvas id="gl-canvas"></canvas>
-  <style>
-    body {
-      padding: 0;
-      margin: 0;
-    }
-
-    #three {
-      padding: 0;
-      margin: 0;
-    }
-  </style>
-</body>
-
+      #three {
+        padding: 0;
+        margin: 0;
+      }
+    </style>
+  </body>
 </html>
