@@ -21,6 +21,15 @@
     <script src="/js/mSocket.js"></script>
     <script src="/shader/MODS.js"></script>
     <script>
+      const WATCH_PARAMS = [
+        "s_size",
+        "s_particles",
+        "s_x_speed",
+        "s_y_speed",
+        "s_x_position",
+        "s_y_position",
+      ];
+
       //シェーダーのロード
       const importMod = (path) => {
         return new Promise(async (resolved) => {
@@ -29,8 +38,32 @@
         });
       };
 
+      //ReqquestAnimationFrameのコールバック
+      let localEnterCallback = [];
+
+      //繰り返し
+      const enterFrame = () => {
+        window.requestAnimationFrame(enterFrame);
+        localEnterCallback.forEach((callback) => {
+          callback();
+        });
+      };
+      window.requestAnimationFrame(enterFrame);
+
       window.addEventListener("load", async () => {
         let current_module = MODULES[0].file;
+        //現在パラメータ
+        let keyAndValue = {
+          s_x_speed: 0.5,
+          s_y_speed: 0.5,
+          s_particles: 0.5,
+          s_size: 0.5,
+          s_x_position: 0.5,
+          s_y_position: 0.5,
+        };
+        //目標パラメータ
+        let targetKeyAndValue = { ...keyAndValue };
+
         //three.js
         const three = TH();
         three.init({
@@ -48,9 +81,22 @@
           s_y_speed: 0.5,
           s_particles: 0.5,
           s_size: 0.5,
+          s_x_position: 0.5,
+          s_y_position: 0.5,
         });
 
         //socket
+        //AnimationFrameを受け取って値を変更する
+        localEnterCallback.push(() => {
+          //パラメータ値を補完アニメーションする
+          const _params = { ...keyAndValue };
+          WATCH_PARAMS.forEach((key) => {
+            _params[key] += (targetKeyAndValue[key] - keyAndValue[key]) / 30;
+          });
+          keyAndValue = _params;
+          three.updateValues(keyAndValue);
+        });
+
         const mixerSockets = _mixerSockets();
         mixerSockets.init();
         mixerSockets.attach(async (values) => {
@@ -58,9 +104,7 @@
           const mod = values.find((item) => {
             return item.key === "s_module";
           });
-          console.log("mod", current_module, mod.value);
           if (current_module !== mod.value) {
-            console.log("update mod", mod.value);
             current_module = mod.value;
             const { FS_CODE, VS_CODE } = await importMod(
               `${mod.value}?v=${rand}`
@@ -69,28 +113,14 @@
           }
 
           //パラメータを変更
-          let keyAndValue = {
-            s_x_speed: 0.5,
-            s_y_speed: 0.5,
-            s_particles: 0.5,
-            s_size: 0.5,
-          };
-          [
-            "s_size",
-            "s_particles",
-            "s_x_speed",
-            "s_y_speed",
-            "s_x_position",
-            "s_y_position",
-          ].forEach((key) => {
+          WATCH_PARAMS.forEach((key) => {
             const _item = values.find((item) => {
               return item.key === key;
             });
             if (_item) {
-              keyAndValue[_item.key] = _item.value;
+              targetKeyAndValue[_item.key] = _item.value;
             }
           });
-          three.updateValues(keyAndValue);
         });
       });
     </script>
